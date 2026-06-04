@@ -1,15 +1,29 @@
 package com.example.pilem.ui.detail;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.pilem.R;
 import com.example.pilem.data.local.AppDatabase;
 import com.example.pilem.data.local.MovieEntity;
+import com.example.pilem.data.model.Genre;
+import com.example.pilem.data.model.MovieCreditsResponse;
+import com.example.pilem.data.model.MovieDetailResponse;
+import com.example.pilem.data.remote.RetrofitClient;
+import java.util.List;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -21,41 +35,126 @@ public class DetailActivity extends AppCompatActivity {
     private String movieTitle;
     private String moviePoster;
     private boolean isFavorite = false;
+
+    private ImageView ivBackdrop, ivPoster;
+    private TextView tvTitle, tvRating, tvGenres, tvOverview;
     private Button btnFavorite;
+    private RecyclerView rvCast;
+    private CastAdapter castAdapter;
+    private ProgressBar progressBar;
+    private ScrollView scrollView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        ImageView ivPoster = findViewById(R.id.iv_detail_poster);
-        TextView tvTitle = findViewById(R.id.tv_detail_title);
-        btnFavorite = findViewById(R.id.btn_favorite);
+        initViews();
+        setupRecyclerView();
 
         movieId = getIntent().getIntExtra(EXTRA_ID, 0);
         movieTitle = getIntent().getStringExtra(EXTRA_TITLE);
         moviePoster = getIntent().getStringExtra(EXTRA_POSTER);
 
+        // Awalnya set data dari intent (fallback)
         tvTitle.setText(movieTitle);
-        String imageUrl = "https://image.tmdb.org/t/p/w500" + moviePoster;
-        Glide.with(this).load(imageUrl).into(ivPoster);
+        Glide.with(this).load("https://image.tmdb.org/t/p/w500" + moviePoster).into(ivPoster);
 
         checkFavoriteStatus();
+        loadMovieDetails();
+        loadMovieCredits();
 
         btnFavorite.setOnClickListener(v -> toggleFavorite());
+    }
+
+    private void initViews() {
+        ivBackdrop = findViewById(R.id.iv_detail_backdrop);
+        ivPoster = findViewById(R.id.iv_detail_poster);
+        tvTitle = findViewById(R.id.tv_detail_title);
+        tvRating = findViewById(R.id.tv_detail_rating);
+        tvGenres = findViewById(R.id.tv_detail_genres);
+        tvOverview = findViewById(R.id.tv_detail_overview);
+        btnFavorite = findViewById(R.id.btn_favorite);
+        rvCast = findViewById(R.id.rv_cast);
+        progressBar = findViewById(R.id.pb_detail);
+        scrollView = findViewById(R.id.scroll_view);
+    }
+
+    private void setupRecyclerView() {
+        castAdapter = new CastAdapter();
+        rvCast.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        rvCast.setAdapter(castAdapter);
+    }
+
+    private void loadMovieDetails() {
+        progressBar.setVisibility(View.VISIBLE);
+        scrollView.setVisibility(View.GONE);
+
+        RetrofitClient.getApiService().getMovieDetail(movieId).enqueue(new Callback<MovieDetailResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<MovieDetailResponse> call, @NonNull Response<MovieDetailResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    displayDetails(response.body());
+                } else {
+                    Toast.makeText(DetailActivity.this, "Failed to load details", Toast.LENGTH_SHORT).show();
+                }
+                progressBar.setVisibility(View.GONE);
+                scrollView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<MovieDetailResponse> call, @NonNull Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(DetailActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadMovieCredits() {
+        RetrofitClient.getApiService().getMovieCredits(movieId).enqueue(new Callback<MovieCreditsResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<MovieCreditsResponse> call, @NonNull Response<MovieCreditsResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    castAdapter.setCastList(response.body().getCast());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<MovieCreditsResponse> call, @NonNull Throwable t) {
+                // Ignore cast error or show small message
+            }
+        });
+    }
+
+    private void displayDetails(MovieDetailResponse detail) {
+        tvTitle.setText(detail.getTitle());
+        tvOverview.setText(detail.getOverview());
+        tvRating.setText(String.format("⭐ %.1f", detail.getVoteAverage()));
+
+        // Format Genres
+        StringBuilder genres = new StringBuilder();
+        List<Genre> genreList = detail.getGenres();
+        if (genreList != null) {
+            for (int i = 0; i < genreList.size(); i++) {
+                genres.append(genreList.get(i).getName());
+                if (i < genreList.size() - 1) genres.append(", ");
+            }
+        }
+        tvGenres.setText(genres.toString());
+
+        Glide.with(this).load("https://image.tmdb.org/t/p/w780" + detail.getBackdropPath()).into(ivBackdrop);
+        Glide.with(this).load("https://image.tmdb.org/t/p/w500" + detail.getPosterPath()).into(ivPoster);
+        
+        // Update local data for favorite
+        movieTitle = detail.getTitle();
+        moviePoster = detail.getPosterPath();
     }
 
     private void checkFavoriteStatus() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             MovieEntity movie = AppDatabase.getDatabase(this).movieDao().getMovieById(movieId);
             isFavorite = movie != null;
-            runOnUiThread(() -> {
-                if (isFavorite) {
-                    btnFavorite.setText("Remove from Favorite");
-                } else {
-                    btnFavorite.setText("Add to Favorite");
-                }
-            });
+            runOnUiThread(() -> btnFavorite.setText(isFavorite ? "Remove from Favorite" : "Add to Favorite"));
         });
     }
 
@@ -70,13 +169,8 @@ public class DetailActivity extends AppCompatActivity {
                 isFavorite = true;
             }
             runOnUiThread(() -> {
-                if (isFavorite) {
-                    btnFavorite.setText("Remove from Favorite");
-                    Toast.makeText(this, "Added to Favorite", Toast.LENGTH_SHORT).show();
-                } else {
-                    btnFavorite.setText("Removed from Favorite");
-                    Toast.makeText(this, "Removed from Favorite", Toast.LENGTH_SHORT).show();
-                }
+                btnFavorite.setText(isFavorite ? "Remove from Favorite" : "Add to Favorite");
+                Toast.makeText(this, isFavorite ? "Added to Favorite" : "Removed from Favorite", Toast.LENGTH_SHORT).show();
             });
         });
     }
