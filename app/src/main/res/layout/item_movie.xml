@@ -33,7 +33,7 @@
             android:background="@drawable/gradient_overlay"
             app:layout_constraintBottom_toBottomOf="@id/iv_item_poster"
             app:layout_constraintEnd_toEndOf="@id/iv_item_poster"
-            app:layout_constraintHeight_percent="1.0"
+            app:layout_constraintHeight_percent="0.9"
             app:layout_constraintStart_toStartOf="@id/iv_item_poster" />
 
         <TextView

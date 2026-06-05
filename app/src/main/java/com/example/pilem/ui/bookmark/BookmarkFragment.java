@@ -17,11 +17,13 @@ import com.example.pilem.data.model.Movie;
 import com.example.pilem.ui.home.MovieAdapter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class BookmarkFragment extends Fragment {
 
     private RecyclerView rvBookmark;
     private TextView tvNoData;
+    private TextView tvBookmarkCount;
     private MovieAdapter adapter;
 
     @Nullable
@@ -36,9 +38,9 @@ public class BookmarkFragment extends Fragment {
 
         rvBookmark = view.findViewById(R.id.rv_bookmark);
         tvNoData = view.findViewById(R.id.tv_no_data);
+        tvBookmarkCount = view.findViewById(R.id.tv_bookmark_count);
 
         adapter = new MovieAdapter();
-        // Menggunakan GridLayoutManager dengan 2 kolom untuk tampilan yang lebih modern
         rvBookmark.setLayoutManager(new GridLayoutManager(getContext(), 2));
         rvBookmark.setAdapter(adapter);
     }
@@ -53,19 +55,20 @@ public class BookmarkFragment extends Fragment {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             List<MovieEntity> entities = AppDatabase.getDatabase(requireContext()).movieDao().getAllBookmarkedMovies();
             
-            // Konversi MovieEntity ke Movie agar bisa menggunakan adapter yang sama
             List<Movie> movies = new ArrayList<>();
             for (MovieEntity entity : entities) {
                 Movie movie = new Movie();
                 movie.setId(entity.getId());
                 movie.setTitle(entity.getTitle());
                 movie.setPosterPath(entity.getPosterPath());
-                // Fields lain opsional untuk list favorit
                 movies.add(movie);
             }
 
             if (getActivity() != null) {
                 getActivity().runOnUiThread(() -> {
+                    int count = movies.size();
+                    tvBookmarkCount.setText(String.format(Locale.getDefault(), "Terdapat %d film tersimpan", count));
+
                     if (movies.isEmpty()) {
                         tvNoData.setVisibility(View.VISIBLE);
                         rvBookmark.setVisibility(View.GONE);
