@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA"
+    android:background="?attr/colorSurface"
     tools:context=".ui.bookmark.BookmarkFragment">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="No Bookmarked Movies"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="?android:attr/textColorSecondary"
         android:textSize="16sp"
         android:visibility="gone" />
 
