@@ -1,6 +1,5 @@
 package com.example.pilem.data.local;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -16,9 +15,9 @@ public interface MovieDao {
     @Delete
     void delete(MovieEntity movie);
 
-    @Query("SELECT * FROM favorite_movies")
-    List<MovieEntity> getAllFavoriteMovies();
+    @Query("SELECT * FROM bookmarked_movies")
+    List<MovieEntity> getAllBookmarkedMovies();
 
-    @Query("SELECT * FROM favorite_movies WHERE id = :id")
+    @Query("SELECT * FROM bookmarked_movies WHERE id = :id")
     MovieEntity getMovieById(int id);
 }

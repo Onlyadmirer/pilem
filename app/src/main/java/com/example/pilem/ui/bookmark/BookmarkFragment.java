@@ -1,4 +1,4 @@
-package com.example.pilem.ui.favorite;
+package com.example.pilem.ui.bookmark;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,7 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.pilem.R;
 import com.example.pilem.data.local.AppDatabase;
@@ -18,39 +18,40 @@ import com.example.pilem.ui.home.MovieAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FavoriteFragment extends Fragment {
+public class BookmarkFragment extends Fragment {
 
-    private RecyclerView rvFavorite;
+    private RecyclerView rvBookmark;
     private TextView tvNoData;
     private MovieAdapter adapter;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_favorite, container, false);
+        return inflater.inflate(R.layout.fragment_bookmark, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        rvFavorite = view.findViewById(R.id.rv_favorite);
+        rvBookmark = view.findViewById(R.id.rv_bookmark);
         tvNoData = view.findViewById(R.id.tv_no_data);
 
         adapter = new MovieAdapter();
-        rvFavorite.setLayoutManager(new LinearLayoutManager(getContext()));
-        rvFavorite.setAdapter(adapter);
+        // Menggunakan GridLayoutManager dengan 2 kolom untuk tampilan yang lebih modern
+        rvBookmark.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        rvBookmark.setAdapter(adapter);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loadFavorites();
+        loadBookmarks();
     }
 
-    private void loadFavorites() {
+    private void loadBookmarks() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            List<MovieEntity> entities = AppDatabase.getDatabase(requireContext()).movieDao().getAllFavoriteMovies();
+            List<MovieEntity> entities = AppDatabase.getDatabase(requireContext()).movieDao().getAllBookmarkedMovies();
             
             // Konversi MovieEntity ke Movie agar bisa menggunakan adapter yang sama
             List<Movie> movies = new ArrayList<>();
@@ -67,10 +68,10 @@ public class FavoriteFragment extends Fragment {
                 getActivity().runOnUiThread(() -> {
                     if (movies.isEmpty()) {
                         tvNoData.setVisibility(View.VISIBLE);
-                        rvFavorite.setVisibility(View.GONE);
+                        rvBookmark.setVisibility(View.GONE);
                     } else {
                         tvNoData.setVisibility(View.GONE);
-                        rvFavorite.setVisibility(View.VISIBLE);
+                        rvBookmark.setVisibility(View.VISIBLE);
                         adapter.setMovies(movies);
                     }
                 });

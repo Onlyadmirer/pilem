@@ -32,6 +32,7 @@ public class ExploreFragment extends Fragment {
     private SearchView searchView;
     private String lastQuery = "";
 
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

@@ -18,10 +18,10 @@
         tools:layout="@layout/fragment_explore" />
 
     <fragment
-        android:id="@+id/navigation_favorite"
-        android:name="com.example.pilem.ui.favorite.FavoriteFragment"
-        android:label="Favorite"
-        tools:layout="@layout/fragment_favorite" />
+        android:id="@+id/navigation_bookmark"
+        android:name="com.example.pilem.ui.bookmark.BookmarkFragment"
+        android:label="Bookmark"
+        tools:layout="@layout/fragment_bookmark" />
 
     <fragment
         android:id="@+id/navigation_settings"

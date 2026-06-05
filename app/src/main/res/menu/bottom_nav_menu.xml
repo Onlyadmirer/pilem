@@ -9,9 +9,9 @@
         android:icon="@android:drawable/ic_menu_search"
         android:title="Explore" />
     <item
-        android:id="@+id/navigation_favorite"
+        android:id="@+id/navigation_bookmark"
         android:icon="@android:drawable/btn_star"
-        android:title="Favorite" />
+        android:title="Bookmark" />
     <item
         android:id="@+id/navigation_settings"
         android:icon="@android:drawable/ic_menu_preferences"

@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.favorite.FavoriteFragment">
+    android:background="#F8F9FA"
+    tools:context=".ui.bookmark.BookmarkFragment">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_favorite"
+        android:id="@+id/rv_bookmark"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@android:layout/simple_list_item_1" />
+        android:clipToPadding="false"
+        android:padding="8dp"
+        tools:listitem="@layout/item_movie" />
 
     <TextView
         android:id="@+id/tv_no_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="No Favorite Movies"
+        android:text="No Bookmarked Movies"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="16sp"
         android:visibility="gone" />
 
 </FrameLayout>

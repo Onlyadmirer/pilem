@@ -34,11 +34,11 @@ public class DetailActivity extends AppCompatActivity {
     private int movieId;
     private String movieTitle;
     private String moviePoster;
-    private boolean isFavorite = false;
+    private boolean isBookmarked = false;
 
     private ImageView ivBackdrop, ivPoster;
     private TextView tvTitle, tvRating, tvGenres, tvOverview;
-    private Button btnFavorite;
+    private Button btnBookmark;
     private RecyclerView rvCast;
     private CastAdapter castAdapter;
     private ProgressBar progressBar;
@@ -60,11 +60,11 @@ public class DetailActivity extends AppCompatActivity {
         tvTitle.setText(movieTitle);
         Glide.with(this).load("https://image.tmdb.org/t/p/w500" + moviePoster).into(ivPoster);
 
-        checkFavoriteStatus();
+        checkBookmarkStatus();
         loadMovieDetails();
         loadMovieCredits();
 
-        btnFavorite.setOnClickListener(v -> toggleFavorite());
+        btnBookmark.setOnClickListener(v -> toggleBookmark());
     }
 
     private void initViews() {
@@ -74,7 +74,7 @@ public class DetailActivity extends AppCompatActivity {
         tvRating = findViewById(R.id.tv_detail_rating);
         tvGenres = findViewById(R.id.tv_detail_genres);
         tvOverview = findViewById(R.id.tv_detail_overview);
-        btnFavorite = findViewById(R.id.btn_favorite);
+        btnBookmark = findViewById(R.id.btn_bookmark);
         rvCast = findViewById(R.id.rv_cast);
         progressBar = findViewById(R.id.pb_detail);
         scrollView = findViewById(R.id.scroll_view);
@@ -145,32 +145,32 @@ public class DetailActivity extends AppCompatActivity {
         Glide.with(this).load("https://image.tmdb.org/t/p/w780" + detail.getBackdropPath()).into(ivBackdrop);
         Glide.with(this).load("https://image.tmdb.org/t/p/w500" + detail.getPosterPath()).into(ivPoster);
         
-        // Update local data for favorite
+        // Update local data
         movieTitle = detail.getTitle();
         moviePoster = detail.getPosterPath();
     }
 
-    private void checkFavoriteStatus() {
+    private void checkBookmarkStatus() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             MovieEntity movie = AppDatabase.getDatabase(this).movieDao().getMovieById(movieId);
-            isFavorite = movie != null;
-            runOnUiThread(() -> btnFavorite.setText(isFavorite ? "Remove from Favorite" : "Add to Favorite"));
+            isBookmarked = movie != null;
+            runOnUiThread(() -> btnBookmark.setText(isBookmarked ? "Remove from Bookmark" : "Add to Bookmark"));
         });
     }
 
-    private void toggleFavorite() {
+    private void toggleBookmark() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             MovieEntity movie = new MovieEntity(movieId, movieTitle, moviePoster);
-            if (isFavorite) {
+            if (isBookmarked) {
                 AppDatabase.getDatabase(this).movieDao().delete(movie);
-                isFavorite = false;
+                isBookmarked = false;
             } else {
                 AppDatabase.getDatabase(this).movieDao().insert(movie);
-                isFavorite = true;
+                isBookmarked = true;
             }
             runOnUiThread(() -> {
-                btnFavorite.setText(isFavorite ? "Remove from Favorite" : "Add to Favorite");
-                Toast.makeText(this, isFavorite ? "Added to Favorite" : "Removed from Favorite", Toast.LENGTH_SHORT).show();
+                btnBookmark.setText(isBookmarked ? "Remove from Bookmark" : "Add to Bookmark");
+                Toast.makeText(this, isBookmarked ? "Added to Bookmark" : "Removed from Bookmark", Toast.LENGTH_SHORT).show();
             });
         });
     }
