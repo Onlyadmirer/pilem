@@ -12,10 +12,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
@@ -39,7 +39,7 @@ public class HomeFragment extends Fragment {
     private ProgressBar progressBar;
     private LinearLayout errorLayout;
     private Button btnRefresh;
-    private SearchView searchView;
+    private ImageView ivSearchHome;
 
     // Hero Section Views
     private CardView cvHero;
@@ -60,24 +60,9 @@ public class HomeFragment extends Fragment {
         initViews(view);
         setupRecyclerViews();
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                if (!query.isEmpty()) {
-                    performSearch(query);
-                }
-                searchView.clearFocus();
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                if (newText.isEmpty()) {
-                    showSearchView(false);
-                }
-                return true;
-            }
-        });
+        ivSearchHome.setOnClickListener(v -> 
+            Navigation.findNavController(v).navigate(R.id.navigation_explore)
+        );
 
         btnRefresh.setOnClickListener(v -> loadAllMovies());
 
@@ -85,7 +70,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        searchView = view.findViewById(R.id.search_view);
+        ivSearchHome = view.findViewById(R.id.iv_search_home);
         nestedScrollView = view.findViewById(R.id.scroll_view_home);
         rvPopular = view.findViewById(R.id.rv_popular);
         rvTopRated = view.findViewById(R.id.rv_top_rated);
@@ -209,25 +194,6 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void performSearch(String query) {
-        showLoading(true);
-        RetrofitClient.getApiService().searchMovies(query, "en-US", 1).enqueue(new Callback<MovieResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<MovieResponse> call, @NonNull Response<MovieResponse> response) {
-                showLoading(false);
-                if (response.isSuccessful() && response.body() != null) {
-                    cvHero.setVisibility(View.GONE); // Hide hero during search
-                    popularAdapter.setMovies(response.body().getResults());
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<MovieResponse> call, @NonNull Throwable t) {
-                showLoading(false);
-            }
-        });
-    }
-
     private void checkLoadingComplete() {
         if (popularAdapter.getItemCount() > 0 || cvHero.getVisibility() == View.VISIBLE) {
             showLoading(false);
@@ -244,12 +210,6 @@ public class HomeFragment extends Fragment {
         if (isError) {
             nestedScrollView.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
-        }
-    }
-
-    private void showSearchView(boolean isSearching) {
-        if (!isSearching) {
-            loadAllMovies();
         }
     }
 }

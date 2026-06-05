@@ -12,6 +12,12 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
+        android:id="@+id/navigation_explore"
+        android:name="com.example.pilem.ui.explore.ExploreFragment"
+        android:label="Explore"
+        tools:layout="@layout/fragment_explore" />
+
+    <fragment
         android:id="@+id/navigation_favorite"
         android:name="com.example.pilem.ui.favorite.FavoriteFragment"
         android:label="Favorite"
