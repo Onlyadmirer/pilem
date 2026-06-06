@@ -9,9 +9,9 @@
         android:icon="@drawable/search"
         android:title="Explore" />
     <item
-        android:id="@+id/navigation_bookmark"
+        android:id="@+id/navigation_watchlist"
         android:icon="@drawable/bookmarks"
-        android:title="Bookmark" />
+        android:title="Watchlist" />
     <item
         android:id="@+id/navigation_settings"
         android:icon="@drawable/settings"
