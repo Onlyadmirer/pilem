@@ -7,19 +7,19 @@
     android:background="?attr/colorSurface"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".ui.bookmark.BookmarkFragment">
+    tools:context=".ui.watchlist.WatchlistFragment">
 
     <TextView
-        android:id="@+id/tv_header_bookmark"
+        android:id="@+id/tv_header_watchlist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bookmarks"
+        android:text="watchlist"
         android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="?attr/colorOnSurface" />
 
     <TextView
-        android:id="@+id/tv_bookmark_count"
+        android:id="@+id/tv_watchlist_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
@@ -34,10 +34,12 @@
         android:layout_weight="1">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_bookmark"
+            android:id="@+id/rv_watchlist"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:spanCount="2"
             tools:listitem="@layout/item_movie" />
 
         <TextView
@@ -45,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="No Bookmarked Movies"
+            android:text="No movies in watchlist"
             android:textColor="?android:attr/textColorSecondary"
             android:textSize="16sp"
             android:visibility="gone" />
