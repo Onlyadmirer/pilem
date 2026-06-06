@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.detail.DetailActivity">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -15,7 +15,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:paddingBottom="24dp">
 
             <ImageView
                 android:id="@+id/iv_detail_backdrop"
@@ -74,32 +75,67 @@
                 app:layout_constraintTop_toBottomOf="@id/tv_detail_rating"
                 tools:text="Action, Adventure" />
 
-            <Button
-                android:id="@+id/btn_bookmark"
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrier_header"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Add to Bookmark"
-                app:layout_constraintStart_toStartOf="@id/tv_detail_title"
-                app:layout_constraintTop_toBottomOf="@id/tv_detail_genres" />
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="iv_detail_poster,tv_detail_genres" />
+
+            <LinearLayout
+                android:id="@+id/ll_action_buttons"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="24dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/barrier_header">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_bookmark"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/watchlist" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_watch_trailer"
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/tonton_trailer"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/label_overview"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:text="Overview"
+                android:layout_marginTop="24dp"
+                android:text="@string/overview"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/iv_detail_poster" />
+                app:layout_constraintTop_toBottomOf="@id/ll_action_buttons" />
 
             <TextView
                 android:id="@+id/tv_detail_overview"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/label_overview"
                 tools:text="Movie Overview goes here..." />
 
@@ -108,8 +144,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:text="Top Billed Cast"
+                android:layout_marginTop="24dp"
+                android:text="@string/top_billed_cast"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -119,7 +155,7 @@
                 android:id="@+id/rv_cast"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
                 android:paddingStart="16dp"
@@ -128,7 +164,22 @@
                 tools:listitem="@layout/item_cast" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
+
+    <ImageButton
+        android:id="@+id/btn_back_detail"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_back_button"
+        android:padding="8dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_back"
+        android:contentDescription="@string/back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@android:color/white" />
 
     <ProgressBar
         android:id="@+id/pb_detail"

@@ -15,9 +15,9 @@ public interface MovieDao {
     @Delete
     void delete(MovieEntity movie);
 
-    @Query("SELECT * FROM bookmarked_movies")
-    List<MovieEntity> getAllBookmarkedMovies();
+    @Query("SELECT * FROM watchlist_movies")
+    List<MovieEntity> getAllWatchlistMovies();
 
-    @Query("SELECT * FROM bookmarked_movies WHERE id = :id")
+    @Query("SELECT * FROM watchlist_movies WHERE id = :id")
     MovieEntity getMovieById(int id);
 }

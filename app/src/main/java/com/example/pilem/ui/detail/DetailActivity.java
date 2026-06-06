@@ -1,15 +1,18 @@
 package com.example.pilem.ui.detail;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
@@ -19,6 +22,8 @@ import com.example.pilem.data.local.MovieEntity;
 import com.example.pilem.data.model.Genre;
 import com.example.pilem.data.model.MovieCreditsResponse;
 import com.example.pilem.data.model.MovieDetailResponse;
+import com.example.pilem.data.model.Video;
+import com.example.pilem.data.model.VideoResponse;
 import com.example.pilem.data.remote.RetrofitClient;
 import java.util.List;
 import retrofit2.Call;
@@ -34,15 +39,16 @@ public class DetailActivity extends AppCompatActivity {
     private int movieId;
     private String movieTitle;
     private String moviePoster;
-    private boolean isBookmarked = false;
+    private boolean isWatchlist = false;
 
     private ImageView ivBackdrop, ivPoster;
     private TextView tvTitle, tvRating, tvGenres, tvOverview;
-    private Button btnBookmark;
+    private Button btnWatchlist, btnWatchTrailer;
+    private ImageButton btnBack;
     private RecyclerView rvCast;
     private CastAdapter castAdapter;
     private ProgressBar progressBar;
-    private ScrollView scrollView;
+    private NestedScrollView scrollView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +62,16 @@ public class DetailActivity extends AppCompatActivity {
         movieTitle = getIntent().getStringExtra(EXTRA_TITLE);
         moviePoster = getIntent().getStringExtra(EXTRA_POSTER);
 
-        // Awalnya set data dari intent (fallback)
         tvTitle.setText(movieTitle);
         Glide.with(this).load("https://image.tmdb.org/t/p/w500" + moviePoster).into(ivPoster);
 
-        checkBookmarkStatus();
+        checkWatchlistStatus();
         loadMovieDetails();
         loadMovieCredits();
+        loadMovieTrailer();
 
-        btnBookmark.setOnClickListener(v -> toggleBookmark());
+        btnWatchlist.setOnClickListener(v -> toggleWatchlist());
+        btnBack.setOnClickListener(v -> finish());
     }
 
     private void initViews() {
@@ -74,7 +81,9 @@ public class DetailActivity extends AppCompatActivity {
         tvRating = findViewById(R.id.tv_detail_rating);
         tvGenres = findViewById(R.id.tv_detail_genres);
         tvOverview = findViewById(R.id.tv_detail_overview);
-        btnBookmark = findViewById(R.id.btn_bookmark);
+        btnWatchlist = findViewById(R.id.btn_bookmark);
+        btnWatchTrailer = findViewById(R.id.btn_watch_trailer);
+        btnBack = findViewById(R.id.btn_back_detail);
         rvCast = findViewById(R.id.rv_cast);
         progressBar = findViewById(R.id.pb_detail);
         scrollView = findViewById(R.id.scroll_view);
@@ -120,9 +129,31 @@ public class DetailActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<MovieCreditsResponse> call, @NonNull Throwable t) {
-                // Ignore cast error or show small message
+            public void onFailure(@NonNull Call<MovieCreditsResponse> call, @NonNull Throwable t) {}
+        });
+    }
+
+    private void loadMovieTrailer() {
+        RetrofitClient.getApiService().getMovieVideos(movieId).enqueue(new Callback<VideoResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<VideoResponse> call, @NonNull Response<VideoResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Video> videos = response.body().getResults();
+                    for (Video video : videos) {
+                        if (video.getSite().equalsIgnoreCase("YouTube") && video.getType().equalsIgnoreCase("Trailer")) {
+                            btnWatchTrailer.setVisibility(View.VISIBLE);
+                            btnWatchTrailer.setOnClickListener(v -> {
+                                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + video.getKey()));
+                                startActivity(intent);
+                            });
+                            break;
+                        }
+                    }
+                }
             }
+
+            @Override
+            public void onFailure(@NonNull Call<VideoResponse> call, @NonNull Throwable t) {}
         });
     }
 
@@ -131,7 +162,6 @@ public class DetailActivity extends AppCompatActivity {
         tvOverview.setText(detail.getOverview());
         tvRating.setText(String.format("⭐ %.1f", detail.getVoteAverage()));
 
-        // Format Genres
         StringBuilder genres = new StringBuilder();
         List<Genre> genreList = detail.getGenres();
         if (genreList != null) {
@@ -145,32 +175,31 @@ public class DetailActivity extends AppCompatActivity {
         Glide.with(this).load("https://image.tmdb.org/t/p/w780" + detail.getBackdropPath()).into(ivBackdrop);
         Glide.with(this).load("https://image.tmdb.org/t/p/w500" + detail.getPosterPath()).into(ivPoster);
         
-        // Update local data
         movieTitle = detail.getTitle();
         moviePoster = detail.getPosterPath();
     }
 
-    private void checkBookmarkStatus() {
+    private void checkWatchlistStatus() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             MovieEntity movie = AppDatabase.getDatabase(this).movieDao().getMovieById(movieId);
-            isBookmarked = movie != null;
-            runOnUiThread(() -> btnBookmark.setText(isBookmarked ? "Remove from Bookmark" : "Add to Bookmark"));
+            isWatchlist = movie != null;
+            runOnUiThread(() -> btnWatchlist.setText(isWatchlist ? R.string.remove_from_watchlist : R.string.add_to_watchlist));
         });
     }
 
-    private void toggleBookmark() {
+    private void toggleWatchlist() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
             MovieEntity movie = new MovieEntity(movieId, movieTitle, moviePoster);
-            if (isBookmarked) {
+            if (isWatchlist) {
                 AppDatabase.getDatabase(this).movieDao().delete(movie);
-                isBookmarked = false;
+                isWatchlist = false;
             } else {
                 AppDatabase.getDatabase(this).movieDao().insert(movie);
-                isBookmarked = true;
+                isWatchlist = true;
             }
             runOnUiThread(() -> {
-                btnBookmark.setText(isBookmarked ? "Remove from Bookmark" : "Add to Bookmark");
-                Toast.makeText(this, isBookmarked ? "Added to Bookmark" : "Removed from Bookmark", Toast.LENGTH_SHORT).show();
+                btnWatchlist.setText(isWatchlist ? R.string.remove_from_watchlist : R.string.add_to_watchlist);
+                Toast.makeText(this, isWatchlist ? "Added to Watchlist" : "Removed from Watchlist", Toast.LENGTH_SHORT).show();
             });
         });
     }

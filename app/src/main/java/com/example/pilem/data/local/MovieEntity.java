@@ -3,7 +3,7 @@ package com.example.pilem.data.local;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "bookmarked_movies")
+@Entity(tableName = "watchlist_movies")
 public class MovieEntity {
     @PrimaryKey
     private int id;
