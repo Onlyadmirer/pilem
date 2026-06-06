@@ -40,6 +40,7 @@ public class HomeFragment extends Fragment {
     private LinearLayout errorLayout;
     private Button btnRefresh;
     private ImageView ivSearchHome;
+    private TextView tvSeeAllPopular, tvSeeAllTopRated, tvSeeAllUpcoming;
 
     // Hero Section Views
     private CardView cvHero;
@@ -59,12 +60,7 @@ public class HomeFragment extends Fragment {
 
         initViews(view);
         setupRecyclerViews();
-
-        ivSearchHome.setOnClickListener(v -> 
-            Navigation.findNavController(v).navigate(R.id.navigation_explore)
-        );
-
-        btnRefresh.setOnClickListener(v -> loadAllMovies());
+        setupClickListeners();
 
         loadAllMovies();
     }
@@ -78,6 +74,9 @@ public class HomeFragment extends Fragment {
         progressBar = view.findViewById(R.id.pb_home);
         errorLayout = view.findViewById(R.id.error_layout);
         btnRefresh = view.findViewById(R.id.btn_refresh);
+        tvSeeAllPopular = view.findViewById(R.id.tv_see_all_popular);
+        tvSeeAllTopRated = view.findViewById(R.id.tv_see_all_top_rated);
+        tvSeeAllUpcoming = view.findViewById(R.id.tv_see_all_upcoming);
 
         // Hero Section
         cvHero = view.findViewById(R.id.cv_hero);
@@ -86,7 +85,7 @@ public class HomeFragment extends Fragment {
         tvHeroRating = view.findViewById(R.id.tv_hero_rating);
         btnHeroDetail = view.findViewById(R.id.btn_hero_detail);
         
-        cvHero.setVisibility(View.GONE); // Hide initially until data is loaded
+        cvHero.setVisibility(View.GONE);
     }
 
     private void setupRecyclerViews() {
@@ -101,6 +100,24 @@ public class HomeFragment extends Fragment {
         rvPopular.setAdapter(popularAdapter);
         rvTopRated.setAdapter(topRatedAdapter);
         rvUpcoming.setAdapter(upcomingAdapter);
+    }
+
+    private void setupClickListeners() {
+        ivSearchHome.setOnClickListener(v -> 
+            Navigation.findNavController(v).navigate(R.id.navigation_explore)
+        );
+
+        btnRefresh.setOnClickListener(v -> loadAllMovies());
+
+        tvSeeAllPopular.setOnClickListener(v -> navigateToSeeAll("popular"));
+        tvSeeAllTopRated.setOnClickListener(v -> navigateToSeeAll("top_rated"));
+        tvSeeAllUpcoming.setOnClickListener(v -> navigateToSeeAll("upcoming"));
+    }
+
+    private void navigateToSeeAll(String category) {
+        Bundle bundle = new Bundle();
+        bundle.putString("category", category);
+        Navigation.findNavController(requireView()).navigate(R.id.action_navigation_home_to_seeAllFragment, bundle);
     }
 
     private void loadAllMovies() {
@@ -119,14 +136,12 @@ public class HomeFragment extends Fragment {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Movie> movies = response.body().getResults();
                     if (movies != null && !movies.isEmpty()) {
-                        // Set Hero Section with the first movie
-                        Movie heroMovie = movies.get(0);
-                        setupHeroSection(heroMovie);
-
-                        // Set the rest of the movies to RecyclerView
+                        setupHeroSection(movies.get(0));
                         List<Movie> remainingMovies = new ArrayList<>(movies);
                         remainingMovies.remove(0);
-                        popularAdapter.setMovies(remainingMovies);
+                        // Limit to 5 items
+                        List<Movie> limitedList = remainingMovies.subList(0, Math.min(remainingMovies.size(), 5));
+                        popularAdapter.setMovies(limitedList);
                     }
                     checkLoadingComplete();
                 } else {
@@ -169,7 +184,11 @@ public class HomeFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<MovieResponse> call, @NonNull Response<MovieResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    topRatedAdapter.setMovies(response.body().getResults());
+                    List<Movie> movies = response.body().getResults();
+                    if (movies != null) {
+                        List<Movie> limitedList = movies.subList(0, Math.min(movies.size(), 5));
+                        topRatedAdapter.setMovies(limitedList);
+                    }
                     checkLoadingComplete();
                 }
             }
@@ -184,7 +203,11 @@ public class HomeFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<MovieResponse> call, @NonNull Response<MovieResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    upcomingAdapter.setMovies(response.body().getResults());
+                    List<Movie> movies = response.body().getResults();
+                    if (movies != null) {
+                        List<Movie> limitedList = movies.subList(0, Math.min(movies.size(), 5));
+                        upcomingAdapter.setMovies(limitedList);
+                    }
                     checkLoadingComplete();
                 }
             }
