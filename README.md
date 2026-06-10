@@ -12,9 +12,9 @@
 
 ## 📸 Screenshots
 
-| Dashboard Utama | Detail Film | Eksplorasi |
-| :---: | :---: | :---: |
-| <img src="screenshots/home.png" width="250" /> | <img src="screenshots/detail.png" width="250" /> | <img src="screenshots/explore.png" width="250" /> |
+|              Dashboard Utama              | Detail Film | Eksplorasi |                   Watchlists                    |
+|:-----------------------------------------:| :---: | :---: |:-----------------------------------------------:|
+| <img src="assets/home.png" width="250" /> | <img src="assets/detail.png" width="250" /> | <img src="assets/explore.png" width="250" /> | <img src="assets/watchlists.png" width="250" /> |
 
 
 ## 🛠️ Tech Stack & Spesifikasi
