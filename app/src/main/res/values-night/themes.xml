@@ -2,6 +2,26 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.Pilem" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="android:windowBackground">@color/dark_background</item>
+        <item name="colorSurface">@color/dark_surface</item>
+        <item name="colorSurfaceVariant">@color/dark_surface_variant</item>
+        <item name="colorOnSurface">@color/text_primary_dark</item>
+        <item name="colorOnSurfaceVariant">@color/text_primary_dark</item>
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+
+        <item name="colorPrimary">@color/tosca_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/tosca_primary</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+
+        <item name="colorSecondary">@color/tosca_primary</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/tosca_primary</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
+
+        <item name="colorTertiary">@color/tosca_primary</item>
+        <item name="colorOnTertiary">@color/white</item>
+        <item name="colorTertiaryContainer">@color/tosca_primary</item>
+        <item name="colorOnTertiaryContainer">@color/white</item>
     </style>
 </resources>

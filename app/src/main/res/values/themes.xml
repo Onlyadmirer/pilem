@@ -2,8 +2,19 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.Pilem" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/tosca_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/tosca_primary</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+
+        <item name="colorSecondary">@color/tosca_primary</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/tosca_primary</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
+
+        <item name="colorOnSurfaceVariant">@color/gray_faded</item>
     </style>
 
-    <style name="Theme.Pilem" parent="Base.Theme.Pilem" />
+    <style name="Theme.Pilem" parent="Base.Theme.Pilem">
+    </style>
 </resources>

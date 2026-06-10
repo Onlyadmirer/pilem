@@ -2,4 +2,12 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="tosca_primary">#00A896</color>
+    <color name="gray_faded">#8E8E8E</color>
+
+    <!-- Dark Mode Colors -->
+    <color name="dark_background">#0A0810</color>
+    <color name="dark_surface">#161320</color>
+    <color name="dark_surface_variant">#242031</color>
+    <color name="text_primary_dark">#E6E1E5</color>
 </resources>
