@@ -30,4 +30,7 @@ public interface ApiService {
 
     @GET("search/movie")
     Call<MovieResponse> searchMovies(@Query("query") String query, @Query("language") String language, @Query("page") int page);
+
+    @GET("discover/movie")
+    Call<MovieResponse> discoverMoviesByGenre(@Query("with_genres") String genreId, @Query("language") String language, @Query("page") int page);
 }

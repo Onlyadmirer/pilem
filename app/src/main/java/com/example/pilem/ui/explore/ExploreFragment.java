@@ -17,6 +17,8 @@ import com.example.pilem.R;
 import com.example.pilem.data.model.MovieResponse;
 import com.example.pilem.data.remote.RetrofitClient;
 import com.example.pilem.ui.home.MovieAdapter;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -30,7 +32,9 @@ public class ExploreFragment extends Fragment {
     private LinearLayout errorLayout;
     private Button btnRefresh;
     private SearchView searchView;
+    private ChipGroup cgGenres;
     private String lastQuery = "";
+    private String lastGenreId = "";
 
 
     @Nullable
@@ -51,6 +55,8 @@ public class ExploreFragment extends Fragment {
             public boolean onQueryTextSubmit(String query) {
                 if (!query.isEmpty()) {
                     lastQuery = query;
+                    lastGenreId = "";
+                    cgGenres.clearCheck();
                     performSearch(query);
                 }
                 searchView.clearFocus();
@@ -59,7 +65,7 @@ public class ExploreFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText.isEmpty()) {
+                if (newText.isEmpty() && lastGenreId.isEmpty()) {
                     showEmptyState(true);
                     exploreAdapter.setMovies(null);
                 }
@@ -67,15 +73,39 @@ public class ExploreFragment extends Fragment {
             }
         });
 
+        cgGenres.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (!checkedIds.isEmpty()) {
+                int checkedId = checkedIds.get(0);
+                Chip chip = group.findViewById(checkedId);
+                if (chip != null) {
+                    String genreId = (String) chip.getTag();
+                    lastGenreId = genreId;
+                    lastQuery = "";
+                    searchView.setQuery("", false);
+                    searchView.clearFocus();
+                    performGenreFilter(genreId);
+                }
+            } else {
+                lastGenreId = "";
+                if (lastQuery.isEmpty()) {
+                    showEmptyState(true);
+                    exploreAdapter.setMovies(null);
+                }
+            }
+        });
+
         btnRefresh.setOnClickListener(v -> {
             if (!lastQuery.isEmpty()) {
                 performSearch(lastQuery);
+            } else if (!lastGenreId.isEmpty()) {
+                performGenreFilter(lastGenreId);
             }
         });
     }
 
     private void initViews(View view) {
         searchView = view.findViewById(R.id.search_view_explore);
+        cgGenres = view.findViewById(R.id.cg_genres);
         rvExplore = view.findViewById(R.id.rv_explore);
         progressBar = view.findViewById(R.id.pb_explore);
         layoutEmptyState = view.findViewById(R.id.layout_empty_state);
@@ -97,16 +127,7 @@ public class ExploreFragment extends Fragment {
         RetrofitClient.getApiService().searchMovies(query, "en-US", 1).enqueue(new Callback<MovieResponse>() {
             @Override
             public void onResponse(@NonNull Call<MovieResponse> call, @NonNull Response<MovieResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    exploreAdapter.setMovies(response.body().getResults());
-                    showLoading(false);
-                    if (exploreAdapter.getItemCount() == 0) {
-                        showEmptyState(true);
-                    }
-                } else {
-                    showLoading(false);
-                    showError(true);
-                }
+                handleResponse(response);
             }
 
             @Override
@@ -115,6 +136,38 @@ public class ExploreFragment extends Fragment {
                 showError(true);
             }
         });
+    }
+
+    private void performGenreFilter(String genreId) {
+        showLoading(true);
+        showError(false);
+        showEmptyState(false);
+
+        RetrofitClient.getApiService().discoverMoviesByGenre(genreId, "en-US", 1).enqueue(new Callback<MovieResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<MovieResponse> call, @NonNull Response<MovieResponse> response) {
+                handleResponse(response);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<MovieResponse> call, @NonNull Throwable t) {
+                showLoading(false);
+                showError(true);
+            }
+        });
+    }
+
+    private void handleResponse(Response<MovieResponse> response) {
+        if (response.isSuccessful() && response.body() != null) {
+            exploreAdapter.setMovies(response.body().getResults());
+            showLoading(false);
+            if (exploreAdapter.getItemCount() == 0) {
+                showEmptyState(true);
+            }
+        } else {
+            showLoading(false);
+            showError(true);
+        }
     }
 
     private void showLoading(boolean isLoading) {
