@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.example.pilem.R;
 import com.example.pilem.data.local.AppDatabase;
 import com.example.pilem.data.local.MovieEntity;
+import com.example.pilem.data.local.UserSession;
 import com.example.pilem.data.model.Genre;
 import com.example.pilem.data.model.MovieCreditsResponse;
 import com.example.pilem.data.model.MovieDetailResponse;
@@ -40,6 +41,7 @@ public class DetailActivity extends AppCompatActivity {
     private String movieTitle;
     private String moviePoster;
     private boolean isWatchlist = false;
+    private UserSession userSession;
 
     private ImageView ivBackdrop, ivPoster;
     private TextView tvTitle, tvRating, tvGenres, tvOverview;
@@ -54,6 +56,8 @@ public class DetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        userSession = new UserSession(this);
 
         initViews();
         setupRecyclerView();
@@ -181,7 +185,8 @@ public class DetailActivity extends AppCompatActivity {
 
     private void checkWatchlistStatus() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            MovieEntity movie = AppDatabase.getDatabase(this).movieDao().getMovieById(movieId);
+            int userId = userSession.getUserId();
+            MovieEntity movie = AppDatabase.getDatabase(this).movieDao().getMovieById(movieId, userId);
             isWatchlist = movie != null;
             runOnUiThread(() -> btnWatchlist.setText(isWatchlist ? R.string.remove_from_watchlist : R.string.add_to_watchlist));
         });
@@ -189,7 +194,8 @@ public class DetailActivity extends AppCompatActivity {
 
     private void toggleWatchlist() {
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            MovieEntity movie = new MovieEntity(movieId, movieTitle, moviePoster);
+            int userId = userSession.getUserId();
+            MovieEntity movie = new MovieEntity(movieId, userId, movieTitle, moviePoster);
             if (isWatchlist) {
                 AppDatabase.getDatabase(this).movieDao().delete(movie);
                 isWatchlist = false;

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.pilem.R;
 import com.example.pilem.data.local.AppDatabase;
 import com.example.pilem.data.local.MovieEntity;
+import com.example.pilem.data.local.UserSession;
 import com.example.pilem.data.model.Movie;
 import com.example.pilem.ui.home.MovieAdapter;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class WatchlistFragment extends Fragment {
     private TextView tvNoData;
     private TextView tvWatchlistCount;
     private MovieAdapter adapter;
+    private UserSession userSession;
 
     @Nullable
     @Override
@@ -36,6 +38,7 @@ public class WatchlistFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        userSession = new UserSession(requireContext());
         rvWatchlist = view.findViewById(R.id.rv_watchlist);
         tvNoData = view.findViewById(R.id.tv_no_data);
         tvWatchlistCount = view.findViewById(R.id.tv_watchlist_count);
@@ -52,8 +55,9 @@ public class WatchlistFragment extends Fragment {
     }
 
     private void loadWatchlist() {
+        int userId = userSession.getUserId();
         AppDatabase.databaseWriteExecutor.execute(() -> {
-            List<MovieEntity> entities = AppDatabase.getDatabase(requireContext()).movieDao().getAllWatchlistMovies();
+            List<MovieEntity> entities = AppDatabase.getDatabase(requireContext()).movieDao().getAllWatchlistMovies(userId);
             
             List<Movie> movies = new ArrayList<>();
             for (MovieEntity entity : entities) {
