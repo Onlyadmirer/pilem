@@ -10,6 +10,13 @@
 - **Dark/Light Mode:** Mendukung tema gelap dan terang secara otomatis mengikuti sistem.
 - **Offline Resilience:** Penanganan kegagalan jaringan dengan fitur *Refresh*.
 
+## 📸 Screenshots
+
+| Dashboard Utama | Detail Film | Eksplorasi |
+| :---: | :---: | :---: |
+| <img src="screenshots/home.png" width="250" /> | <img src="screenshots/detail.png" width="250" /> | <img src="screenshots/explore.png" width="250" /> |
+
+
 ## 🛠️ Tech Stack & Spesifikasi
 - **Bahasa Pemrograman:** Java
 - **Arsitektur & UI:**
@@ -54,6 +61,14 @@ Aplikasi ini menggunakan sistem keamanan untuk melindungi API Key agar tidak ter
 ### 5. Build & Run
 - Sambungkan perangkat Android fisik atau gunakan Emulator (Min SDK 29).
 - Klik tombol **Run** (ikon segitiga hijau) di toolbar atas Android Studio untuk menjalankan aplikasi.
+
+## 📦 Unduh APK
+
+Anda dapat langsung mencoba aplikasi ini dengan mengunduh berkas APK yang tersedia:
+
+1. Buka halaman [Releases Pilem](https://github.com/Onlyadmirer/pilem/releases).
+2. Cari versi terbaru dan unduh file `Pilem.apk` pada bagian **Assets**.
+3. Instal APK tersebut di perangkat Android Anda (pastikan izin instalasi dari sumber tidak dikenal telah diaktifkan).
 
 ## 📝 Implementasi Teknis Singkat
 
