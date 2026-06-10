@@ -33,9 +33,8 @@
 ### 2. Clone Repositori
 Langkah pertama adalah menyalin repositori ini ke komputer lokal Anda. Buka terminal atau command prompt, lalu jalankan perintah:
 ```bash
-git clone https://github.com/username/pilem.git
+git clone https://github.com/Onlyadmirer/pilem.git
 ```
-*(Catatan: Ganti URL di atas dengan URL repositori Anda yang sebenarnya)*
 
 ### 3. Buka Proyek di Android Studio
 1. Jalankan **Android Studio**.
