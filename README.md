@@ -1,13 +1,15 @@
 # Pilem - Aplikasi Informasi Film
 
-**Pilem** adalah aplikasi Android berbasis Java yang dikembangkan sebagai Tugas Final Laboratorium Pemrograman Mobile. Aplikasi ini memungkinkan pengguna untuk menjelajahi daftar film populer, mencari film, dan menyimpan film favorit ke dalam penyimpanan lokal.
+**Pilem** adalah aplikasi Android berbasis Java yang dikembangkan sebagai Tugas Final Laboratorium Pemrograman Mobile. Aplikasi ini memungkinkan pengguna untuk menjelajahi daftar film populer, mencari film, dan menyimpan film favorit ke dalam penyimpanan lokal dengan dukungan multi-user.
 
 ## 📱 Fitur Utama
+- **Autentikasi Pengguna:** Sistem Login dan Register untuk mengelola akun pengguna secara lokal.
 - **Daftar Film Populer:** Menampilkan daftar film terbaru menggunakan RecyclerView.
 - **Pencarian Film:** Memudahkan pengguna mencari film melalui fitur Explore.
 - **Detail Film:** Informasi lengkap mengenai film yang dipilih (menggunakan Explicit Intent).
-- **Favorit (Lokal):** Menyimpan daftar film favorit secara permanen menggunakan Room Database.
-- **Dark/Light Mode:** Mendukung tema gelap dan terang secara otomatis mengikuti sistem.
+- **Watchlist (Multi-user):** Menyimpan daftar film favorit secara permanen menggunakan Room Database, terisolasi untuk setiap akun pengguna melalui `userId`.
+- **Dark/Light Mode:** Mendukung tema gelap dan terang secara manual melalui menu pengaturan.
+- **Manajemen Sesi:** Fitur Logout untuk keluar dari akun dan mengakhiri sesi pengguna.
 - **Offline Resilience:** Penanganan kegagalan jaringan dengan fitur *Refresh*.
 
 ## 📸 Screenshots
@@ -24,7 +26,8 @@
   - Material Design 3 (M3).
   - RecyclerView dengan ListAdapter/Adapter.
 - **Networking:** Retrofit dengan OkHttp Interceptor untuk manajemen API Key.
-- **Local Database:** Room Database untuk penyimpanan data favorit.
+- **Local Database:** Room Database untuk penyimpanan data akun dan watchlist.
+- **Session Management:** SharedPreferences untuk mengelola sesi login pengguna (`UserSession`).
 - **Concurrency:** `ExecutorService` untuk operasi database di background thread.
 - **Library Pihak Ketiga:**
   - Glide (Image Loading).
@@ -72,10 +75,11 @@ Anda dapat langsung mencoba aplikasi ini dengan mengunduh berkas APK yang tersed
 
 ## 📝 Implementasi Teknis Singkat
 
-- **Manajemen Fragment:** Perpindahan antar layar utama (Home, Explore, Favorit) dikelola oleh `NavHostFragment` dan `BottomNavigationView` melalui Navigation Graph.
-- **Keamanan API:** Setiap request ke TMDB disisipkan API Key secara otomatis menggunakan `Interceptor` pada OkHttp Client, sehingga tidak perlu menuliskan key secara manual di setiap endpoint.
-- **Operasi Database:** Semua operasi `Insert`, `Delete`, dan `Get` pada Room Database dijalankan secara asinkron menggunakan `ExecutorService` untuk menjaga kelancaran UI dan mencegah Application Not Responding (ANR).
-- **Interaksi Antar Layar:** Perpindahan dari daftar film ke halaman detail menggunakan **Intent Eksplisit** dengan pengiriman data objek film.
+- **Manajemen Fragment & Navigasi:** Perpindahan antar layar (Auth, Home, Explore, Watchlist, Settings) dikelola oleh `NavHostFragment` melalui Navigation Graph. Sesi login dicek untuk menentukan layar pertama yang muncul.
+- **Sistem Autentikasi:** Menggunakan Room Database untuk menyimpan kredensial pengguna dan `UserSession` (SharedPreferences) untuk menjaga status login.
+- **Keamanan API:** Setiap request ke TMDB disisipkan API Key secara otomatis menggunakan `Interceptor` pada OkHttp Client.
+- **Isolasi Data (Multi-user):** Data watchlist dikaitkan dengan `userId` unik di dalam database, sehingga setiap pengguna memiliki daftar favorit yang berbeda.
+- **Operasi Database:** Semua operasi Room dijalankan secara asinkron menggunakan `ExecutorService` untuk menjaga kelancaran UI.
 
 ---
 *Proyek ini dikembangkan untuk memenuhi tugas akhir praktikum Mobile Programming.*
