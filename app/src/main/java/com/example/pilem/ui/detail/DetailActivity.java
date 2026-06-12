@@ -66,8 +66,16 @@ public class DetailActivity extends AppCompatActivity {
         movieTitle = getIntent().getStringExtra(EXTRA_TITLE);
         moviePoster = getIntent().getStringExtra(EXTRA_POSTER);
 
-        tvTitle.setText(movieTitle);
-        Glide.with(this).load("https://image.tmdb.org/t/p/w500" + moviePoster).into(ivPoster);
+        // Langsung tampilkan data dari Intent (berguna saat offline/data lokal)
+        if (movieTitle != null) {
+            tvTitle.setText(movieTitle);
+        }
+        if (moviePoster != null) {
+            Glide.with(this)
+                    .load("https://image.tmdb.org/t/p/w500" + moviePoster)
+                    .placeholder(android.R.drawable.ic_menu_gallery)
+                    .into(ivPoster);
+        }
 
         checkWatchlistStatus();
         loadMovieDetails();
@@ -101,24 +109,25 @@ public class DetailActivity extends AppCompatActivity {
 
     private void loadMovieDetails() {
         progressBar.setVisibility(View.VISIBLE);
-        scrollView.setVisibility(View.GONE);
-
+        
         RetrofitClient.getApiService().getMovieDetail(movieId).enqueue(new Callback<MovieDetailResponse>() {
             @Override
             public void onResponse(@NonNull Call<MovieDetailResponse> call, @NonNull Response<MovieDetailResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     displayDetails(response.body());
                 } else {
-                    Toast.makeText(DetailActivity.this, "Failed to load details", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DetailActivity.this, "Failed to load details from server", Toast.LENGTH_SHORT).show();
+
+                    scrollView.setVisibility(View.VISIBLE);
                 }
                 progressBar.setVisibility(View.GONE);
-                scrollView.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onFailure(@NonNull Call<MovieDetailResponse> call, @NonNull Throwable t) {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(DetailActivity.this, "Network error", Toast.LENGTH_SHORT).show();
+                scrollView.setVisibility(View.VISIBLE);
+                Toast.makeText(DetailActivity.this, "Mode Offline: Menampilkan data lokal", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -181,6 +190,7 @@ public class DetailActivity extends AppCompatActivity {
         
         movieTitle = detail.getTitle();
         moviePoster = detail.getPosterPath();
+        scrollView.setVisibility(View.VISIBLE);
     }
 
     private void checkWatchlistStatus() {

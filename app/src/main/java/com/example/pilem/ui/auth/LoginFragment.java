@@ -1,5 +1,6 @@
 package com.example.pilem.ui.auth;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.example.pilem.MainActivity;
 import com.example.pilem.R;
 import com.example.pilem.data.local.AppDatabase;
 import com.example.pilem.data.local.UserEntity;
@@ -35,10 +37,6 @@ public class LoginFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         userSession = new UserSession(requireContext());
-        if (userSession.isLoggedIn()) {
-            Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_navigation_home);
-            return;
-        }
 
         etUsername = view.findViewById(R.id.et_username);
         etPassword = view.findViewById(R.id.et_password);
@@ -60,7 +58,11 @@ public class LoginFragment extends Fragment {
                     if (user != null) {
                         userSession.createSession(user.getUserId());
                         Toast.makeText(requireContext(), "Login successful", Toast.LENGTH_SHORT).show();
-                        Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_navigation_home);
+                        
+                        // Explicit Intent to MainActivity
+                        Intent intent = new Intent(requireActivity(), MainActivity.class);
+                        startActivity(intent);
+                        requireActivity().finish();
                     } else {
                         Toast.makeText(requireContext(), "Invalid credentials", Toast.LENGTH_SHORT).show();
                     }
